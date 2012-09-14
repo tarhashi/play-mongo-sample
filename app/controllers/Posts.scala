@@ -21,6 +21,14 @@ object Posts extends Controller {
       ((post: Post) => Some(post.title, post.body))
   )
 
+  val commentForm = Form(
+    mapping(
+      "body" -> nonEmptyText
+    )
+      ((body: String) => Comment(body = body))
+      ((comment: Comment) => Some(comment.body))
+  )
+
   def index = Action { implicit request =>
     val posts = Post.findAll.toList
     Ok(views.html.Posts.index(posts))
@@ -28,7 +36,7 @@ object Posts extends Controller {
 
   def show(id: String) = Action { implicit request =>
     Post.findOneById(id) match {
-      case Some(p: Post) => Ok(views.html.Posts.show(p))
+      case Some(p: Post) => Ok(views.html.Posts.show(p, commentForm))
       case _ => Redirect(routes.Posts.index)
     }
   }
@@ -47,5 +55,22 @@ object Posts extends Controller {
           }
         }
     )
+  }
+
+  def addComment(id: String) = Action { implicit request =>
+     Post.findOneById(id) match {
+      case Some(p: Post) => {
+        commentForm.bindFromRequest.fold(
+           errors => BadRequest(views.html.Posts.show(p, errors)),
+           comment => {
+             val comments = p.comments :+ comment
+             val toUpdate = p.copy(comments = comments)
+             Post.update(MongoDBObject("_id" -> p.id), toUpdate, false, false, new WriteConcern)
+             Redirect(routes.Posts.show(p.id.toString))           
+           }
+        )
+      }
+      case _ => Redirect(routes.Posts.index)
+    }
   }
 }

@@ -5,10 +5,11 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /posts                      controllers.Posts.index
-GET     /posts/new                  controllers.Posts.newInput
-POST    /posts                      controllers.Posts.create
-GET     /posts/$id<[0-9a-z]+>       controllers.Posts.show(id: String)
+GET     /posts                        controllers.Posts.index
+GET     /posts/new                    controllers.Posts.newInput
+POST    /posts                        controllers.Posts.create
+GET     /posts/$id<[0-9a-z]+>         controllers.Posts.show(id: String)
+POST    /posts/$id<[0-9a-z]+>/comment controllers.Posts.addComment(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
