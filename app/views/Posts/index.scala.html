@@ -1,0 +1,12 @@
+@(posts: List[Post])
+@import helper._
+
+@main("Posts") {
+    <h1>Posts(@posts.size posts)</h1>
+    <a href="@{routes.Posts.newInput}">new post</a>
+    <ul>
+        @posts.map { post =>
+            <li><a href="@{routes.Posts.show(post.id.toString)}">@post.title</a></li>
+        }
+    </ul>
+}
