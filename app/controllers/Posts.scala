@@ -68,7 +68,7 @@ object Posts extends Controller {
            }
         )
       }
-      case _ => Redirect(routes.Posts.index)
+      case _ => NotFound
     }
   }
 }
