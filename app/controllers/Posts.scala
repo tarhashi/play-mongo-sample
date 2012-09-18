@@ -37,7 +37,7 @@ object Posts extends Controller {
   def show(id: String) = Action { implicit request =>
     Post.findOneById(id) match {
       case Some(p: Post) => Ok(views.html.Posts.show(p, commentForm))
-      case _ => Redirect(routes.Posts.index)
+      case _ => NotFound
     }
   }
 
@@ -63,9 +63,7 @@ object Posts extends Controller {
         commentForm.bindFromRequest.fold(
            errors => BadRequest(views.html.Posts.show(p, errors)),
            comment => {
-             val comments = p.comments :+ comment
-             val toUpdate = p.copy(comments = comments)
-             Post.update(MongoDBObject("_id" -> p.id), toUpdate, false, false, new WriteConcern)
+             Post.addComment(p, comment)
              Redirect(routes.Posts.show(p.id.toString))           
            }
         )

@@ -22,6 +22,26 @@ case class Post(
 object Post extends ModelCompanion[Post, ObjectId]{
   val dao = new SalatDAO[Post, ObjectId](collection = mongoCollection("posts")) {}
 
-  def findOneById(id: String): Option[Post] = dao.findOneById(new ObjectId(id))
+  def findOneById(id: String): Option[Post] = {
+    try {
+      dao.findOneById(new ObjectId(id))
+    }catch {
+      case e: IllegalArgumentException => None
+      case _ => None
+    }
+  }
+  
+  def addComment(p: Post, comment: Comment) = {
+    update(
+        MongoDBObject("_id" -> p.id),
+        MongoDBObject(
+            "$addToSet" -> MongoDBObject(
+                "comments" -> MongoDBObject(
+                    "body" -> comment.body
+                )
+            )
+        ),
+        false, false, new WriteConcern)
+  }
 
 }
