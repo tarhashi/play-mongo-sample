@@ -35,7 +35,7 @@ object Post extends ModelCompanion[Post, ObjectId]{
     update(
         MongoDBObject("_id" -> p.id),
         MongoDBObject(
-            "$addToSet" -> MongoDBObject(
+            "$push" -> MongoDBObject(
                 "comments" -> MongoDBObject(
                     "body" -> comment.body
                 )
